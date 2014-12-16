@@ -1,0 +1,131 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Untitled Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- link rel="stylesheet" href="bootstrap-dist/css/bootstrap.css" /-->
+    <link rel="stylesheet" href="selectize-dist/css/selectize.bootstrap3.css" />
+    <link rel="stylesheet" href="jquery-ui-1.11.2/jquery.appendGrid-1.5.0.css" />
+    <link href="jquery-ui-1.11.2/jquery-ui.structure.css" rel="stylesheet"/>
+    <link href="jquery-ui-1.11.2/jquery-ui.theme.css" rel="stylesheet"/>
+     <link rel="stylesheet" href="jquery-mobile/jquery.mobile-1.4.5.css" />
+
+    <script type="text/javascript" src="jquery-ui-1.11.2/jquery.js"></script>
+    <script type="text/javascript" src="jquery-ui-1.11.2/jquery-ui.js"></script>
+    <script type="text/javascript" src="jquery-ui-1.11.2/jquery.layout-latest.js"></script>
+    <!--script type="text/javascript" src="bootstrap-dist/js/bootstrap.js"></script -->
+    <script type="text/javascript" src="selectize-dist/js/standalone/selectize.js"></script>
+    <script type="text/javascript" src="jquery-appendgrid/jquery-pearl-sale-table-1.5.0.js"></script>
+    <script type="text/javascript" src="jquery-mobile/jquery.mobile-1.4.5.js"></script>
+</head>
+<body>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#brand").selectize({
+                plugins: ['remove_button'],
+                delimiter: ',',
+                persist: false,
+                create: function (input) {
+                    return {
+                        value: input,
+                        text: input
+                    }
+                }
+            });
+
+            $('#purchasedetail').pearlSaleTable({
+                caption: 'My CD Collections',
+                initRows: 1,
+                showSelectButton : true,
+                columns: [
+                { name: 'Album', display: 'Album', type: 'text', ctrlAttr: { maxlength: 100 }, ctrlCss: { width: '160px'} },
+                { name: 'Artist', display: 'Artist', type: 'text', ctrlAttr: { maxlength: 100 }, ctrlCss: { width: '100px'} },
+                { name: 'Year', display: 'Year', type: 'text', ctrlAttr: { maxlength: 4 }, ctrlCss: { width: '40px'} },
+                { name: 'Origin', display: 'Origin', type: 'select', ctrlOptions: { 0: '{Choose}', 1: 'Hong Kong', 2: 'Taiwan', 3: 'Japan', 4: 'Korea', 5: 'US', 6: 'Others'} },
+                { name: 'Poster', display: 'With Poster?', type: 'checkbox' },
+                { name: 'Price', display: 'Price', type: 'text', ctrlAttr: { maxlength: 10 }, ctrlCss: { width: '50px', 'text-align': 'right' }, value: 0 }
+            ],
+             initData: [
+                    { 'Album': 'Dearest', 'Artist': 'Theresa Fu', 'Year': '2009', 'Origin': 1, 'Poster': true, 'Price': 168.9 },
+                    { 'Album': 'To be Free', 'Artist': 'Arashi', 'Year': '2010', 'Origin': 3, 'Poster': true, 'Price': 152.6 },
+                    { 'Album': 'Count On Me', 'Artist': 'Show Luo', 'Year': '2012', 'Origin': 2, 'Poster': false, 'Price': 306.8 },
+                    { 'Album': 'Wonder Party', 'Artist': 'Wonder Girls', 'Year': '2012', 'Origin': 4, 'Poster': true, 'Price': 108.6 },
+                    { 'Album': 'Reflection', 'Artist': 'Kelly Chen', 'Year': '2013', 'Origin': 1, 'Poster': false, 'Price': 138.2 }
+                ]
+            });
+
+        });
+        function sendRequest(success_callback, failure_callback, data, ws_url, asynchronous) {
+            $.ajax({
+                async: asynchronous,
+                type: "GET",
+                crossDomain: true, //if cross domain req 
+                dataType: "json",
+                Accept: "application/json",
+                contentType: "application/json",
+                url: ws_url,
+                data: data,
+                success: success_callback,
+                error: failure_callback
+            });
+
+        }
+
+        function success_callback(response)
+        {
+
+        }
+
+        function failure_callback(response) {
+
+        }
+
+    </script>
+    <div>
+       <div class="ui-button, ui-icon, ui-button-text-icon-primary .ui-icon-circle-plus">Add</div>
+    </div>
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <p>
+                Data Management</p>
+        </div>
+        <div class="row-fluid">
+            <div class="col-md-2">
+                <ul class="nav nav-pills nav-stacked">
+                    <li role="presentation" class="active"><a href="#">Home</a></li>
+                    <li role="presentation"><a href="#">Dashboard</a></li>
+                    <li role="presentation"><a href="#">Data Input</a></li>
+                </ul>
+            </div>
+            <div class="col-md-10">               
+                <div class="form-group">
+                    <label for="brand">
+                        Brand:</label>
+                    <input type="text" class="form-control" id="brand" />
+                </div>
+                <div class="form-group">
+                    <label for="productname">
+                        Product Name:</label>
+                    <input type="text" class="form-control" id="productname" />
+                </div>
+                <div class="form-group">
+                    <label for="productid">
+                        Product ID:</label>
+                    <input type="text" class="form-control" id="productid" />
+                </div>
+                <div class="form-group">
+                    <label for="size">
+                        Size:</label>
+                    <input type="text" class="form-control" id="size" />
+                </div>
+                <div class="form-group">
+                    <label for="color">
+                        Color:</label>
+                    <input type="text" class="form-control" id="color" />
+                </div>
+                <table id="purchasedetail"></table>                        
+            </div>
+        </div>
+    </div>
+</body>
+</html>
