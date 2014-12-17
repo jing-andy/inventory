@@ -133,9 +133,36 @@
 		subPanel : null,
 		footer : null
 	};
-    
-     var _defaultButtonClasses = { append: null, removeLast: null, insert: null, remove: null, moveUp: null, moveDown: null, rowDrag: null };
-     var _defaultHideButtons = { append: false, removeLast: false, insert: false, remove: false, moveUp: false, moveDown: false };
+
+	var _defaultButtonResource = {
+		'insert' : {
+			icon : 'ui-icon-plus'
+		},
+		'delete' : {
+			icon : 'ui-icon-delete'
+		},
+		'edit' : {
+			icon : 'ui-icon-edit'
+		}
+	}
+
+	var _defaultButtonClasses = {
+		append : null,
+		removeLast : null,
+		insert : null,
+		remove : null,
+		moveUp : null,
+		moveDown : null,
+		rowDrag : null
+	};
+	var _defaultHideButtons = {
+		append : false,
+		removeLast : false,
+		insert : false,
+		remove : false,
+		moveUp : false,
+		moveDown : false
+	};
 	var _methods = {
 		init : function (options) {
 			var target = this;
@@ -217,9 +244,10 @@
 				$(tbWhole).empty().addClass('ui-body-d ui-shadow table-stripe ui-responsive');
 				$(tbWhole).attr({
 					'data-role' : 'table',
-					'data-mode' : 'reflow'
+					'data-mode' : 'reflow',
+					'data-mini' : 'true'
 				});
-				tbHead = $('<thead></thead>').appendTo(tbWhole).addClass('ui-bar-c');
+				tbHead = $('<thead></thead>').appendTo(tbWhole);
 				tbBody = $('<tbody></tbody>').appendTo(tbWhole);
 				tbFoot = $('<tfoot></tfoot>').appendTo(tbWhole);
 
@@ -274,9 +302,7 @@
 						}
 					}
 
-					if (settings.hideButtons.insert && settings.hideButtons.remove
-						 && settings.hideButtons.moveUp && settings.hideButtons.moveDown
-						 && (!$.isArray(settings.customRowButtons) || settings.customRowButtons.length == 0)) {
+					if (!$.isArray(settings.customRowButtons) || settings.customRowButtons.length == 0) {
 						settings._hideLastColumn = true;
 					}
 					//Calculate the '-finalColSpan' value
@@ -288,7 +314,7 @@
 
 				// Add caption when defined
 				if (settings.caption) {
-					$(tbHead).insertBefore(tbRow=$('<tr></tr>'), $('tr', tbHead));
+					$(tbRow = $('<tr></tr>')).insertBefore($('tr:first', tbHead));
 					if (settings._sectionClasses.caption) {
 						tbRow.className = settings._sectionClasses.caption;
 					}
@@ -320,8 +346,8 @@
 
 				// Show no rows in grid
 				// if (settings._rowOrder.length == 0) {
-					// var empty = $('<td style={display:inline}></td>').text(settings._i18n.rowEmpty).attr('colspan', settings._finalColSpan);
-					// $('tbody', tbWhole).append($('<tr></tr>').addClass('empty').append(empty));
+				// var empty = $('<td style={display:inline}></td>').text(settings._i18n.rowEmpty).attr('colspan', settings._finalColSpan);
+				// $('tbody', tbWhole).append($('<tr></tr>').addClass('empty').append(empty));
 				// }
 			}
 			$(target).table();
@@ -631,43 +657,76 @@
 		}
 		return settings;
 	}
-	function createCheckbox(tbCell, label, ctrlId, ctrlName, hideLabel) {
+
+	var _tableCellContentFactory = {
+		"checkbox" : createCheckbox,
+		"text" : createLabel,
+		"select" : createSelect,
+		"input" : createInput,
+		"controlgroup" : createControlGroup
+	};
+
+	function createTableCellContent(tbCell, type, id, name, cssClass, cssAttribute, data) {
+		var t = type;
+		if (isEmpty(_tableCellContentFactory[t])) {
+			t = 'text';
+		}
+		var ctrl = _tableCellContentFactory[t](tbCell, id, name, data);
+
+        if(!isEmpty(cssClass)){
+		     $(ctrl).addClass(cssClass)    
+		}
+		
+		if (!isEmpty(cssAttribute)) {
+			$(ctrl).attr(cssAttribute);
+		}
+	}
+
+	function createCheckbox(tbCell, id, name, data) {
 		var template = $.validator.format(
 				"<input type='checkbox' name={0} id={1} value={2} data-theme='b'/>");
-		var ctrl = $(template(ctrlName, ctrlId, '0')).appendTo(tbCell);
+		var ctrl = $(template(name, id, data.value)).appendTo(tbCell);
 		$(tbCell).trigger('create');
 		return ctrl;
 	}
-	function createLabel(tbCell, label, ctrlId, ctrlName) {
+	function createLabel(tbCell, id, name, data) {
 		var template = $.validator.format("<div id={0} name={1}>{2}</div>");
-		var ctrl = $(template(ctrlId, ctrlId, label)).appendTo(tbCell).css({
-				'display' : 'inline'
+		var ctrl = $(template(id, name, data.value)).appendTo(tbCell).css({
+				'textAlign' : 'center'
 			});
 		return ctrl;
 	}
-	function createSelect(tbCell, ctrlId, ctrlName, attrs) {
+	function createSelect(tbCell, id, name, data) {
 		var selectTemplate = $.validator.format(
-				'<select name={0} id={1}></select>');
-		var ctrl = $(selectTemplate(ctrlName, ctrlId)).appendTo(tbCell);
-		if (!isEmpty(attrs)) {
-			$(ctrl).attr(attrs);
-		}
+				'<select name={0} id={1} value={2}></select>');
+		var ctrl = $(selectTemplate(name, id, data.value)).appendTo(tbCell);
 		var optionTemplate = $.validator.format('<option value={0}>{1}</option>');
-		$(optionTemplate('1', 'Coach')).appendTo(ctrl);
-		$(optionTemplate('2', 'Kate Spade')).appendTo(ctrl);
-
+		data.options.forEach(function (entry) {
+			$(optionTemplate(entry.value, entry.display)).appendTo(ctrl);
+		})
 		$(tbCell).trigger('create');
 		return ctrl;
 	}
 
-	function createInput(tbCell, ctrlId, ctrlName, attrs) {
-		var inputTemplate = $.validator.format("<input type='text' name={0} id={1} data-clear-btn='true' value='0'/>");
-		var ctrl = $(inputTemplate(ctrlName, ctrlId)).appendTo(tbCell);
-		if (!isEmpty(attrs)) {
-			$(ctrl).attr(attrs);
-		}
+	function createInput(tbCell, id, name, data) {
+		var inputTemplate = $.validator.format("<input type='text' name={0} id={1} data-clear-btn='true' value={2} />");
+		var ctrl = $(inputTemplate(name, id, data.value)).appendTo(tbCell);
 		$(tbCell).trigger('create');
 		return ctrl;
+	}
+
+	function createControlGroup(tbCell, id, name, data) {
+		var groupTemplate = $.validator.format("<div data-role='controlgroup' id={0} name={1} data-type='horizontal'></div>");
+		var group = $(groupTemplate(id, name)).appendTo(tbCell);
+		var btnTemplate = $.validator.format("<a class='ui-btn ui-corner-all {0} ui-btn-icon-notext' id={1} name={2} href='#' />");
+		data.options.forEach(function (entry) {
+			var buttonId = id + '_' + entry;
+			var buttonName = name + '_' + entry;
+			$(btnTemplate(_defaultButtonResource[entry].icon, buttonId, buttonName)).appendTo(group);
+		});
+
+		$(tbCell).trigger('create');
+		return group;
 	}
 
 	function createListview(tbCell, data) {
@@ -784,8 +843,10 @@
 
 			// Add row number
 			if (!settings.hideRowNumColumn) {
-				var no = "<td>" + (z + 1).toString() + "</td>";
-				$(no).appendTo(tbRow);
+				var ctrlId = settings.idPrefix + '_NO_' + z;
+				
+				createTableCellContent(tbCell = $('<td></td>'), 'text', ctrlId, ctrlId, null, null, {"value":z+1});
+				$(tbCell).appendTo(tbRow);
 				if (settings.useSubPanel)
 					tbCell.rowSpan = 2;
 			}
@@ -804,20 +865,36 @@
 
 				var tbCell = $("<td></td>").appendTo(tbRow);
 
-				var ctrlId = settings.idPrefix + '_' + settings.columns[y].name + '_' + uniqueIndex,
-				ctrlName;
-
-				ctrlName = ctrlId;
+				var ctrlId = settings.idPrefix + '_' + settings.columns[y].name + '_' + uniqueIndex;
+				var ctrlName = ctrlId;
 				var ctrlType = settings.columns[y].type;
-				if (ctrlType == 'select') {
-					createSelect(tbCell, ctrlId, ctrlId, null, null);
+				createTableCellContent(tbCell, ctrlType, ctrlId, ctrlId, null, null, {
+					value : 'a',
+					options : [{
+							value : 'a',
+							display : 'Coach'
+						}, {
+							value : 'b',
+							display : 'Kate Spade'
+						}
+					]
+				});
+
+				/* if (ctrlType == 'select') {
+				createSelect(tbCell, ctrlId, ctrlId, null, null);
 				} else if (ctrlType == 'input') {
-					createInput(tbCell, ctrlId, ctrlId, null);
+				createInput(tbCell, ctrlId, ctrlId, null);
 				} else {
-					createLabel(tbCell, numOfRowOrRowArray[z][settings.columns[y].name], ctrlId, ctrlId);
-				}
+				createLabel(tbCell, numOfRowOrRowArray[z][settings.columns[y].name], ctrlId, ctrlId);
+				} */
+
 			}
 
+			if (!settings._hideLastColumn) {
+				var tbCell = $("<td></td>").appendTo(tbRow);
+				var ctrlId = settings.idPrefix + '_CtrlGroup_' + z;
+				createTableCellContent(tbCell, 'controlgroup', ctrlId, ctrlId, null, null, {"options":settings.customRowButtons});
+			}
 			// Create sub panel
 			if (settings.useSubPanel) {
 				tbSubRow.appendChild(tbCell = document.createElement('td'));
@@ -898,7 +975,7 @@
 		}
 		// Add empty row
 		if (settings._rowOrder.length == 0) {
-			var empty = $('<td style={display:inline}></td>').text(settings._i18n.rowEmpty).attr('colspan', settings._finalColSpan);
+			var empty = $('<td></td>').text(settings._i18n.rowEmpty).attr('colspan', settings._finalColSpan);
 			$('tbody', tbWhole).append($('<tr></tr>').addClass('empty').append(empty));
 		}
 	}
@@ -913,7 +990,7 @@
 		saveSetting(tbWhole, settings);
 		// Add empty row
 		if (settings._rowOrder.length == 0) {
-			var empty = $('<td style={display:inline}></td>').text(settings._i18n.rowEmpty).attr('colspan', settings._finalColSpan);
+			var empty = $('<td></td>').text(settings._i18n.rowEmpty).attr('colspan', settings._finalColSpan);
 			$('tbody', tbWhole).append($('<tr></tr>').addClass('empty').append(empty));
 		}
 	}
