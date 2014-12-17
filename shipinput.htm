@@ -5,29 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="jquery-mobile/jquery.mobile-1.4.5.css" />
     <link rel="stylesheet" href="css/pearl-sale-table.css" />
+    <link rel="stylesheet" href="datepicker/jquery.mobile.datepicker.css">
     <script type="text/javascript" src="jquery-ui-1.11.2/jquery.js"></script>
     <script type="text/javascript" src="jquery-appendgrid/jquery-pearl-sale-table-1.5.0.js"></script>
     <script type="text/javascript" src="jquery-mobile/jquery.mobile-1.4.5.js"></script>
     <script type="text/javascript" src="jquery-validation-1.13.1/dist/jquery.validate.js"></script>
+    <script type="text/javascript" src="datepicker/external/jquery-ui/datepicker.js"></script>
+    <script type="text/javascript" src="datepicker/jquery.mobile.datepicker.js"></script>
 </head>
 <body>
     <script type="text/javascript">
         $(document).ready(function () {
-            $('#ship-collection').pearlSaleTable({
+            $('#productlist').pearlSaleTable({
                 caption: 'My CD Collections',
                 initRows: 1,
                 showSelectButton: true,
-                useSubPanel: true,
+                useSubPanel: false,
                 columns: [
-                { name: 'Id', display: 'ID', type: 'text' },
-                { name: 'Date', display: 'Date', type: 'text' },
-                { name: 'From', display: 'From', type: 'text' },
-                { name: 'To', display: 'To', type: 'select' },
-                { name: 'Status', display: 'Status', type: 'text' },
-                { name: 'Shipper', display: 'Shipper', type: 'checkbox' },
-                { name: 'ShipperNo', display: 'Shipper No', type: 'text' },
-                { name: 'Currency', display: 'Currency', type: 'text' },
-                { name: 'Price', display: 'Price', type: 'text' }
+                { name: 'Brand', display: 'Brand', type: 'select' },
+                { name: 'Sku', display: 'Sku', type: 'select' },
+                { name: 'Quantity', display: 'Quantity', type: 'input' },
+                { name: 'Color', display: 'Color', type: 'Text' },
+                { name: 'Size', display: 'Size', type: 'text' }
                 ],
                 initData: [
                     { 'Album': 'Dearest', 'Artist': 'Theresa Fu', 'Year': '2009', 'Origin': 1, 'Poster': true, 'Price': 168.9 },
@@ -72,7 +71,7 @@
 
     </script>
     <!-- Start of first page -->
-    <div class="ui-page-theme-a" data-role="page" id="foo" data-theme="f">
+    <div data-role="page" id="foo" data-theme="f">
         <div data-role="header" data-position="fixed">
             <div data-role="navbar">
                 <ul>
@@ -83,18 +82,66 @@
             </div>
         </div>
         <div role="main" class="ui-content">
-              <input name="date" type="text" data-role="date">
-            <fieldset class="ui-grid-a ui-mini"> 
-                <div class="ui-block-a">
-                         <h2>Date:</h2>
-                       
-                </div>
-                <div class="ui-block-b">
-                         <h2>Price1:</h2>
-                         <input name="price" id="Text1" type="text" value="0.00">
-                </div>
-            </fieldset>
-            
+            <div class="ui-field-contain">
+                        <label class="ui-label" for="date">Date:</label>
+                        <input name="date" id="date" type="text" data-role="date">
+             </div>
+             <div class="ui-field-contain">
+                        <label class="ui-label" for="select-native-2">From:</label>
+                        <select name="from" id="from" data-mini="true">
+                            <option value="1">The 1st Option</option>
+                            <option value="2">The 2nd Option</option>
+                            <option value="3">The 3rd Option</option>
+                            <option value="4">The 4th Option</option>
+                        </select>
+             </div>
+             <div class="ui-field-contain">
+                        <label class="ui-label" for="to">To:</label>
+                        <select name="to" id="to" data-mini="true">
+                            <option value="1">The 1st Option</option>
+                            <option value="2">The 2nd Option</option>
+                            <option value="3">The 3rd Option</option>
+                            <option value="4">The 4th Option</option>
+                        </select>
+             </div> 
+              <div class="ui-field-contain">
+                        <label class="ui-label" for="status">Status:</label>
+                        <select name="Status" id="Status" data-mini="true">
+                            <option value="1">The 1st Option</option>
+                            <option value="2">The 2nd Option</option>
+                            <option value="3">The 3rd Option</option>
+                            <option value="4">The 4th Option</option>
+                        </select>
+             </div> 
+              <div class="ui-field-contain">
+                        <label class="ui-label" for="shipper">Shipper:</label>
+                        <select name="shipper" id="shipper" data-mini="true">
+                            <option value="1">The 1st Option</option>
+                            <option value="2">The 2nd Option</option>
+                            <option value="3">The 3rd Option</option>
+                            <option value="4">The 4th Option</option>
+                        </select>
+             </div> 
+             <div class="ui-field-contain">
+                        <label class="ui-label" for="shipper">Shipper No:</label>
+                        <input type="text" name="shipperno" id="shipperno" data-clear-btn="true" data-mini="true" />
+             </div>
+             <div class="ui-field-contain" style="display:inline">
+                        <label class="ui-label" for="price">Price:</label>
+                        <input type="text" name="price" id="price" data-clear-btn="true" data-mini="true" />
+             </div>
+             <div class="ui-field-contain">
+                        <label class="ui-label" for="currency">currency:</label>
+                        <select name="currency" id="Select1" data-mini="true">
+                            <option value="1">The 1st Option</option>
+                            <option value="2">The 2nd Option</option>
+                            <option value="3">The 3rd Option</option>
+                            <option value="4">The 4th Option</option>
+                        </select>
+             </div>
+            <div class="ui-field-contain">
+                        <table id="productlist"></table>
+             </div>
         </div>
         <!-- /content -->
         <div data-role="footer" data-position="fixed">
