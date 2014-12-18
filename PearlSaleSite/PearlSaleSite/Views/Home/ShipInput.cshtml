@@ -1,0 +1,142 @@
+﻿@{
+    ViewBag.Title = "ShipInput";
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#productlist').pearlSaleTable({
+            caption: 'My CD Collections',
+            initRows: 1,
+            showSelectButton: true,
+            useSubPanel: false,
+            columns: [
+                { name: 'Brand', display: 'Brand', type: 'select' },
+                { name: 'Sku', display: 'Sku', type: 'select' },
+                { name: 'Quantity', display: 'Quantity', type: 'input' },
+                { name: 'Color', display: 'Color', type: 'text' },
+                { name: 'Size', display: 'Size', type: 'text' }
+                ],
+            initData: [
+                    { 'Brand': 'CH', 'Sku': 'KS', 'Quantity': '2009', 'Color': 1, 'Size': 168.9 },
+                    { 'Brand': 'KS', 'Sku': 'CH', 'Quantity': '2010', 'Color': 3, 'Size': 152.6 },
+                    { 'Brand': 'CH', 'Sku': 'KS', 'Quantity': '2012', 'Color': 2, 'Size': 306.8 },
+                    { 'Brand': 'CH', 'Sku': 'KS', 'Quantity': '2012', 'Color': 4, 'Size': 108.6 },
+                    { 'Brand': 'KS', 'Sku': 'CH', 'Quantity': '2013', 'Color': 1, 'Size': 138.2 }
+                ],
+            customRowButtons: ['insert', 'delete'],
+            subPanelcolumns: [
+                { name: 'img', display: 'ID', type: 'img' },
+                { name: 'brand', display: 'Brand', type: 'p' },
+                { name: 'sku', display: 'sku', type: 'p' },
+                { name: 'quantity', display: 'Quantity', type: 'p' }
+                ]
+        });
+
+    });
+    function sendRequest(success_callback, failure_callback, data, ws_url, asynchronous) {
+        $.ajax({
+            async: asynchronous,
+            type: "GET",
+            crossDomain: true, //if cross domain req 
+            dataType: "json",
+            Accept: "application/json",
+            contentType: "application/json",
+            url: ws_url,
+            data: data,
+            success: success_callback,
+            error: failure_callback
+        });
+
+    }
+
+    function success_callback(response) {
+
+    }
+
+    function failure_callback(response) {
+
+    }
+
+    </script>
+    <!-- Start of first page -->
+    <div data-role="page" id="foo" data-theme="f">
+        <div data-role="header" data-position="fixed">
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#" data-icon="plus">new</a></li>
+                    <li><a href="#" data-icon="refresh">sync</a></li>
+                    <li><a href="#" data-icon="search">search</a></li>
+                </ul>
+            </div>
+        </div>
+        <div role="main" class="ui-content">
+            <div class="ui-field-contain">
+                        <label class="ui-label" for="date">Date:</label>
+                        <input name="date" id="ship-input-date" type="text" data-role="date">
+             </div>
+             <div class="ui-field-contain">
+                        <label class="ui-label" for="select-native-2">From:</label>
+                        <select name="from" id="ship-input-from" data-mini="true">
+                            <option value="1">The 1st Option</option>
+                            <option value="2">The 2nd Option</option>
+                            <option value="3">The 3rd Option</option>
+                            <option value="4">The 4th Option</option>
+                        </select>
+             </div>
+             <div class="ui-field-contain">
+                        <label class="ui-label" for="to">To:</label>
+                        <select name="to" id="ship-input-to" data-mini="true">
+                            <option value="1">The 1st Option</option>
+                            <option value="2">The 2nd Option</option>
+                            <option value="3">The 3rd Option</option>
+                            <option value="4">The 4th Option</option>
+                        </select>
+             </div> 
+              <div class="ui-field-contain">
+                        <label class="ui-label" for="status">Status:</label>
+                        <select name="ship-input-status" id="ship-input-status" data-mini="true">
+                            <option value="1">The 1st Option</option>
+                            <option value="2">The 2nd Option</option>
+                            <option value="3">The 3rd Option</option>
+                            <option value="4">The 4th Option</option>
+                        </select>
+             </div> 
+              <div class="ui-field-contain">
+                        <label class="ui-label" for="shipper">Shipper:</label>
+                        <select name="shipper" id="ship-input-shipper" data-mini="true">
+                            <option value="1">The 1st Option</option>
+                            <option value="2">The 2nd Option</option>
+                            <option value="3">The 3rd Option</option>
+                            <option value="4">The 4th Option</option>
+                        </select>
+             </div> 
+             <div class="ui-field-contain">
+                        <label class="ui-label" for="shipper">Shipper No:</label>
+                        <input type="text" name="shipperno" id="ship-input-shipperno" data-clear-btn="true" data-mini="true" />
+             </div>
+             <div class="ui-field-contain" style="display:inline">
+                        <label class="ui-label" for="price">Price:</label>
+                        <input type="text" name="price" id="ship-input-price" data-clear-btn="true" data-mini="true" />
+             </div>
+             <div class="ui-field-contain">
+                        <label class="ui-label" for="currency">currency:</label>
+                        <select name="currency" id="ship-input-currency" data-mini="true">
+                            <option value="1">The 1st Option</option>
+                            <option value="2">The 2nd Option</option>
+                            <option value="3">The 3rd Option</option>
+                            <option value="4">The 4th Option</option>
+                        </select>
+             </div>
+            <div class="ui-field-contain">
+                        <table id="productlist"></table>
+             </div>
+        </div>
+        <!-- /content -->
+        <div data-role="footer" data-position="fixed">
+            <a class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-delete" href="#">Cancel</a>
+            <h1>My App</h1>
+            <button class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-check">Save</button>
+        </div>
+        <!-- /footer -->
+    </div>
+    <!-- /page -->

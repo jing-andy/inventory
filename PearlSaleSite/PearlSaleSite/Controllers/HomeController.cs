@@ -15,6 +15,13 @@ namespace PearlSaleSite.Controllers
             return View();
         }
 
+        public ActionResult ShipInput()
+        {
+            ViewBag.Message = "Welcome to ASP.NET MVC!";
+
+            return View();
+        }
+
         public ActionResult About()
         {
             return View();
