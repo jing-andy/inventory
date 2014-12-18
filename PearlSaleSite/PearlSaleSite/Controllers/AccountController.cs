@@ -7,7 +7,7 @@ using System.Web.Routing;
 using System.Web.Security;
 using PearlSaleSite.Models;
 
-namespace PearlSaleSite.Controllers
+namespace Pearl.Sale.Controllers
 {
     public class AccountController : Controller
     {
