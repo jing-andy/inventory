@@ -1018,8 +1018,8 @@
 	function sortSequence(tbWhole, startIndex) {
 		var settings = $(tbWhole).data('pearlSaleTable');
 		if (!settings.hideRowNumColumn) {
-			for (var z = startIndex; z < settings._rowOrder.length; z++) {
-				$('#' + settings.idPrefix + '_Row_' + settings._rowOrder[z] + ' td.first', tbWhole).text(z + 1);
+			for (var z = startIndex; z < settings._rowOrder.length; z++) {			
+				$('#' + settings.idPrefix + '_NO_' + settings._rowOrder[z], tbWhole).text(z + 1);
 			}
 		}
 	}
