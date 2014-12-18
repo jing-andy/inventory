@@ -136,10 +136,31 @@
 
 	var _defaultButtonResource = {
 		'insert' : {
-			icon : 'ui-icon-plus'
+			icon : 'ui-icon-plus',
+			onClick : function (tbWhole) {
+				function handler(evt) {
+					var rowUniqueIndex = $(this).data('appendGrid').uniqueIndex;
+					$(tbWhole).pearlSaleTable('insertRow', 1, null, rowUniqueIndex);
+					if (evt && evt.preventDefault)
+						evt.preventDefault();
+					return false;
+				};
+
+				return handler;
+			}
 		},
 		'delete' : {
-			icon : 'ui-icon-delete'
+			icon : 'ui-icon-delete',
+			onClick : function (tbWhole) {
+				function handler(evt) {
+					var rowUniqueIndex = $(this).data('appendGrid').uniqueIndex;
+					removeRow(tbWhole, null, rowUniqueIndex, false);
+					if (evt && evt.preventDefault)
+						evt.preventDefault();
+					return false;
+				}
+				return handler;
+			}
 		},
 		'edit' : {
 			icon : 'ui-icon-edit'
@@ -256,7 +277,7 @@
 					$(tbHeadRow).addClass(settings._sectionClasses.header);
 				}
 
-				var template = $.validator.format("<th 'data-priority'={0}>{1}</th>");
+				var template = $.validator.format("<th 'data-priority'={0} style='text-align:center'>{1}</th>");
 
 				if (!settings.hideRowNumColumn) {
 					thCell = $(template("2", "No")).appendTo(tbHeadRow)
@@ -321,7 +342,6 @@
 
 					$(tbRow).append(tbCell = $('<th></th>'));
 					tbCell.id = settings.idPrefix + '_caption_td';
-					//tbCell.className = 'ui-bar';
 					tbCell.colSpan = settings._finalColSpan;
 					// Add tooltip
 					if ($.isPlainObject(settings.captionTooltip)) {
@@ -345,10 +365,10 @@
 				}
 
 				// Show no rows in grid
-				// if (settings._rowOrder.length == 0) {
-				// var empty = $('<td style={display:inline}></td>').text(settings._i18n.rowEmpty).attr('colspan', settings._finalColSpan);
-				// $('tbody', tbWhole).append($('<tr></tr>').addClass('empty').append(empty));
-				// }
+				if (settings._rowOrder.length == 0) {
+					var empty = $('<td style={display:inline}></td>').text(settings._i18n.rowEmpty).attr('colspan', settings._finalColSpan);
+					$('tbody', tbWhole).append($('<tr></tr>').addClass('empty').append(empty));
+				}
 			}
 			$(target).table();
 			return target;
@@ -662,44 +682,43 @@
 		"checkbox" : createCheckbox,
 		"text" : createLabel,
 		"select" : createSelect,
-		"input" : createInput,
-		"controlgroup" : createControlGroup
+		"input" : createInput
 	};
 
-	function createTableCellContent(tbCell, type, id, name, cssClass, cssAttribute, data) {
+	function createTableCellContent(tbCell, type, id, name, cssClass, cssAttribute, data, context) {
 		var t = type;
 		if (isEmpty(_tableCellContentFactory[t])) {
 			t = 'text';
 		}
-		var ctrl = _tableCellContentFactory[t](tbCell, id, name, data);
+		var ctrl = _tableCellContentFactory[t](tbCell, id, name, data, context);
 
-        if(!isEmpty(cssClass)){
-		     $(ctrl).addClass(cssClass)    
+		if (!isEmpty(cssClass)) {
+			$(ctrl).addClass(cssClass)
 		}
-		
+
 		if (!isEmpty(cssAttribute)) {
 			$(ctrl).attr(cssAttribute);
 		}
 	}
 
-	function createCheckbox(tbCell, id, name, data) {
+	function createCheckbox(tbCell, id, name, data, context) {
 		var template = $.validator.format(
-				"<input type='checkbox' name={0} id={1} value={2} data-theme='b'/>");
-		var ctrl = $(template(name, id, data.value)).appendTo(tbCell);
+				"<input type='checkbox' name={0} id={1} data-theme='b'/>");
+		var ctrl = $(template(name, id)).appendTo(tbCell);
 		$(tbCell).trigger('create');
 		return ctrl;
 	}
-	function createLabel(tbCell, id, name, data) {
-		var template = $.validator.format("<div id={0} name={1}>{2}</div>");
-		var ctrl = $(template(id, name, data.value)).appendTo(tbCell).css({
+	function createLabel(tbCell, id, name, data, context) {
+		var template = $.validator.format("<div><span id={0} name={1}> </span></div>");
+		var ctrl = $(template(id, name)).appendTo(tbCell).css({
 				'textAlign' : 'center'
 			});
 		return ctrl;
 	}
-	function createSelect(tbCell, id, name, data) {
+	function createSelect(tbCell, id, name, data, context) {
 		var selectTemplate = $.validator.format(
-				'<select name={0} id={1} value={2}></select>');
-		var ctrl = $(selectTemplate(name, id, data.value)).appendTo(tbCell);
+				'<select name={0} id={1}></select>');
+		var ctrl = $(selectTemplate(name, id)).appendTo(tbCell);
 		var optionTemplate = $.validator.format('<option value={0}>{1}</option>');
 		data.options.forEach(function (entry) {
 			$(optionTemplate(entry.value, entry.display)).appendTo(ctrl);
@@ -708,25 +727,11 @@
 		return ctrl;
 	}
 
-	function createInput(tbCell, id, name, data) {
-		var inputTemplate = $.validator.format("<input type='text' name={0} id={1} data-clear-btn='true' value={2} />");
-		var ctrl = $(inputTemplate(name, id, data.value)).appendTo(tbCell);
+	function createInput(tbCell, id, name, data, context) {
+		var inputTemplate = $.validator.format("<input type='text' name={0} id={1} data-clear-btn='true' />");
+		var ctrl = $(inputTemplate(name, id)).appendTo(tbCell);
 		$(tbCell).trigger('create');
 		return ctrl;
-	}
-
-	function createControlGroup(tbCell, id, name, data) {
-		var groupTemplate = $.validator.format("<div data-role='controlgroup' id={0} name={1} data-type='horizontal'></div>");
-		var group = $(groupTemplate(id, name)).appendTo(tbCell);
-		var btnTemplate = $.validator.format("<a class='ui-btn ui-corner-all {0} ui-btn-icon-notext' id={1} name={2} href='#' />");
-		data.options.forEach(function (entry) {
-			var buttonId = id + '_' + entry;
-			var buttonName = name + '_' + entry;
-			$(btnTemplate(_defaultButtonResource[entry].icon, buttonId, buttonName)).appendTo(group);
-		});
-
-		$(tbCell).trigger('create');
-		return group;
 	}
 
 	function createListview(tbCell, data) {
@@ -758,6 +763,9 @@
 		$(tbCell).trigger('create');
 		return listViewHeader;
 	}
+
+	// rowIndex specifies the row to be operated.
+	// callerUniqueIndex specifies the index of row corresponding data in data set.
 	function insertRow(tbWhole, numOfRowOrRowArray, rowIndex, callerUniqueIndex) {
 		// Define variables
 		var settings = $(tbWhole).data('pearlSaleTable');
@@ -773,7 +781,10 @@
 		tbCell;
 		// Check number of row to be inserted
 		var numOfRow = numOfRowOrRowArray,
+
+		// Control data loading after a new row is created.
 		loadData = false;
+
 		if ($.isArray(numOfRowOrRowArray)) {
 			numOfRow = numOfRowOrRowArray.length;
 			loadData = true;
@@ -827,10 +838,12 @@
 				}
 				addedRows.push(settings._rowOrder.length - 1);
 			}
+
 			tbRow.id = settings.idPrefix + '_Row_' + uniqueIndex;
 			if (settings._sectionClasses.body) {
 				tbRow.className = settings._sectionClasses.body;
 			}
+
 			$(tbRow).data('pearlSaleTable', uniqueIndex);
 			// Config on the sub panel row
 			if (tbSubRow != null) {
@@ -843,9 +856,9 @@
 
 			// Add row number
 			if (!settings.hideRowNumColumn) {
-				var ctrlId = settings.idPrefix + '_NO_' + z;
-				
-				createTableCellContent(tbCell = $('<td></td>'), 'text', ctrlId, ctrlId, null, null, {"value":z+1});
+				var ctrlId = settings.idPrefix + '_NO_' + uniqueIndex;
+				createTableCellContent(tbCell = $('<td></td>').appendTo(tbRow), 'text', ctrlId, ctrlId, null, null, null);
+				$('#' + ctrlId, tbBody).text(settings._rowOrder.length);
 				$(tbCell).appendTo(tbRow);
 				if (settings.useSubPanel)
 					tbCell.rowSpan = 2;
@@ -871,29 +884,40 @@
 				createTableCellContent(tbCell, ctrlType, ctrlId, ctrlId, null, null, {
 					value : 'a',
 					options : [{
-							value : 'a',
+							value : 'CH',
 							display : 'Coach'
 						}, {
-							value : 'b',
+							value : 'KS',
 							display : 'Kate Spade'
 						}
 					]
 				});
 
-				/* if (ctrlType == 'select') {
-				createSelect(tbCell, ctrlId, ctrlId, null, null);
-				} else if (ctrlType == 'input') {
-				createInput(tbCell, ctrlId, ctrlId, null);
-				} else {
-				createLabel(tbCell, numOfRowOrRowArray[z][settings.columns[y].name], ctrlId, ctrlId);
-				} */
+				if (loadData) {
+					// Load data if needed
+					setCtrlValue(settings, y, uniqueIndex, numOfRowOrRowArray[z][settings.columns[y].name]);
+				} else if (!isEmpty(settings.columns[y].value)) {
+					// Set default value
+					setCtrlValue(settings, y, uniqueIndex, settings.columns[y].value);
+				}
 
 			}
 
 			if (!settings._hideLastColumn) {
 				var tbCell = $("<td></td>").appendTo(tbRow);
-				var ctrlId = settings.idPrefix + '_CtrlGroup_' + z;
-				createTableCellContent(tbCell, 'controlgroup', ctrlId, ctrlId, null, null, {"options":settings.customRowButtons});
+				var ctrlId = settings.idPrefix + '_CtrlGroup_' + uniqueIndex;
+
+				var groupTemplate = $.validator.format("<div data-role='controlgroup' id={0} name={1} data-type='horizontal'></div>");
+				var group = $(groupTemplate(ctrlId, ctrlId)).appendTo(tbCell);
+				var btnTemplate = $.validator.format("<a class='ui-btn ui-corner-all {0} ui-btn-icon-notext' id={1} name={2} href='#' />");
+				settings.customRowButtons.forEach(function (entry) {
+					var buttonId = ctrlId + '_' + entry;
+					$(btnTemplate(_defaultButtonResource[entry].icon, buttonId, buttonId)).appendTo(group).click(_defaultButtonResource[entry].onClick(tbWhole)).data('appendGrid', {
+						uniqueIndex : uniqueIndex
+					});
+				});
+
+				$(tbCell).trigger('create');
 			}
 			// Create sub panel
 			if (settings.useSubPanel) {
@@ -939,12 +963,9 @@
 			if (force || typeof(settings.beforeRowRemove) != 'function' || settings.beforeRowRemove(tbWhole, rowIndex)) {
 				settings._rowOrder.splice(rowIndex, 1);
 				if (settings.useSubPanel) {
-					// tbBody.deleteRow(rowIndex * 2);
-					// tbBody.deleteRow(rowIndex * 2);
 					tbBody.removeChild(tbBody.childNodes[rowIndex * 2]);
 					tbBody.removeChild(tbBody.childNodes[rowIndex * 2]);
 				} else {
-					// tbBody.deleteRow(rowIndex);
 					tbBody.removeChild(tbBody.childNodes[rowIndex]);
 				}
 				// Save setting
@@ -1123,10 +1144,13 @@
 			if ($.isFunction(settings.columns[colIndex].customSetter)) {
 				settings.columns[colIndex].customSetter(settings.idPrefix, columnName, uniqueIndex, data);
 			}
-		} else if (type == 'ui-selectmenu') {
+		} else if (type == 'select') {
 			var menu = getCellCtrl(type, settings.idPrefix, columnName, uniqueIndex);
 			menu.value = (data == null ? '' : data);
 			$(menu).selectmenu('refresh');
+		} else if (type == 'text') {
+			var label = getCellCtrl(type, settings.idPrefix, columnName, uniqueIndex);
+			$(label).text(data);
 		} else {
 			getCellCtrl(type, settings.idPrefix, columnName, uniqueIndex).value = (data == null ? '' : data);
 		}
