@@ -1,4 +1,19 @@
 ﻿
+.ui-table .ui-btn,
+.ui-table .ui-input-text, 
+.ui-table .ui-checkbox,
+.ui-table .ui-table-cell-text
+  {
+    font-weight:normal;
+    font-size:small;
+}
+
+.ui-table input[type='checkbox']
+{
+    margin-top:0px
+}
+
+.ui-datepicker{ z-index: 9999 !important;}
 
 /* A bit custom styling */
 .my-page .ui-listview li .ui-btn p {

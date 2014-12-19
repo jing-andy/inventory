@@ -1,0 +1,140 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="jquery-mobile/jquery.mobile-1.4.5.css" />
+    <link rel="stylesheet" href="css/pearl-sale-table.css" />
+    <link rel="stylesheet" href="datepicker/jquery.mobile.datepicker.css">
+    <link rel="stylesheet" href="jquery-ui-1.11.2/jquery-ui.css">
+    <script type="text/javascript" src="jquery-ui-1.11.2/jquery.js"></script>
+    <script type="text/javascript" src="jquery-appendgrid/jquery-pearl-sale-table-1.5.0.js"></script>
+    <script type="text/javascript" src="jquery-mobile/jquery.mobile-1.4.5.js"></script>
+    <script type="text/javascript" src="jquery-validation-1.13.1/dist/jquery.validate.js"></script>
+    <script type="text/javascript" src="datepicker/external/jquery-ui/datepicker.js"></script>
+    <script type="text/javascript" src="datepicker/jquery.mobile.datepicker.js"></script>
+</head>
+<body>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#productlist').pearlSaleTable({
+                caption: 'items',
+                initRows: 1,
+                showSelectButton: true,
+                useSubPanel: false,
+                columns: [
+                { name: 'Brand', display: 'Brand', type: 'select', displayCss: { width: '10%' }},
+        { name: 'Sku', display: 'Sku', type: 'select', displayCss: { width: '15%' } },
+                { name: 'Name', display: 'Name', type: 'select', displayCss: { width: '10%' } },
+                { name: 'StyleNo', display: 'Style No', type: 'select', displayCss: { width: '10%' } },
+                { name: 'Quantity', display: 'Quantity', type: 'input', displayCss: { width: '5%' } },
+                { name: 'ListPrice', display: 'List Price', type: 'input', displayCss: { width: '5%' } },
+                { name: 'Price', display: 'Price', type: 'input', displayCss: { width: '5%' } },
+                { name: 'HasTax', display: 'HasTax', type: 'checkbox', displayCss: { width: '5%' } },
+                { name: 'Color', display: 'Color', type: 'text', displayCss: { width: '10%' } },
+                { name: 'Size', display: 'Size', type: 'text', displayCss: { width: '10%' } }
+                ],
+                initData: [
+                    { 'Brand': 'CH', 'Sku': 'KS', 'Quantity': '2009', 'Color': 1, 'Size': 168.9 },
+                    { 'Brand': 'KS', 'Sku': 'CH', 'Quantity': '2010', 'Color': 3, 'Size': 152.6 },
+                    { 'Brand': 'CH', 'Sku': 'KS', 'Quantity': '2012', 'Color': 2, 'Size': 306.8 },
+                    { 'Brand': 'CH', 'Sku': 'KS', 'Quantity': '2012', 'Color': 4, 'Size': 108.6 },
+                    { 'Brand': 'KS', 'Sku': 'CH', 'Quantity': '2013', 'Color': 1, 'Size': 138.2 }
+                ],
+                customRowButtons:['insert','delete'],
+                subPanelcolumns: [
+                { name: 'img', display: 'ID', type: 'img' },
+                { name: 'brand', display: 'Brand', type: 'p' },
+                { name: 'sku', display: 'sku', type: 'p' },
+                { name: 'quantity', display: 'Quantity', type: 'p' }
+                ]
+            });
+
+        });
+        function sendRequest(success_callback, failure_callback, data, ws_url, asynchronous) {
+            $.ajax({
+                async: asynchronous,
+                type: "GET",
+                crossDomain: true, //if cross domain req 
+                dataType: "json",
+                Accept: "application/json",
+                contentType: "application/json",
+                url: ws_url,
+                data: data,
+                success: success_callback,
+                error: failure_callback
+            });
+
+        }
+
+        function success_callback(response) {
+
+        }
+
+        function failure_callback(response) {
+
+        }
+
+    </script>
+    <!-- Start of first page -->
+    <div data-role="page" id="foo" data-theme="f">
+        <div data-role="header" data-position="fixed">
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#" data-icon="plus">new</a></li>
+                    <li><a href="#" data-icon="refresh">sync</a></li>
+                    <li><a href="#" data-icon="search">search</a></li>
+                </ul>
+            </div>
+        </div>
+        <div role="main" class="ui-content">
+            <div class="ui-field-contain">
+                        <label class="ui-label" for="buy-input-date">Date:</label>
+                        <input name="date" id="buy-input-date" type="text" data-role="date">
+             </div>
+             <div class="ui-field-contain">
+                        <label class="ui-label" for="buy-input-store">Store:</label>
+                        <select name="store" id="buy-input-store" data-mini="true">
+                            <option value="1">The 1st Option</option>
+                            <option value="2">The 2nd Option</option>
+                            <option value="3">The 3rd Option</option>
+                            <option value="4">The 4th Option</option>
+                        </select>
+             </div>
+             <div class="ui-field-contain">
+                        <label class="ui-label" for="buy-input-buyer">Buyer:</label>
+                        <select name="buyer" id="buy-input-buyer" data-mini="true">
+                            <option value="1">The 1st Option</option>
+                            <option value="2">The 2nd Option</option>
+                            <option value="3">The 3rd Option</option>
+                            <option value="4">The 4th Option</option>
+                        </select>
+             </div> 
+             <div class="ui-field-contain">
+                        <label class="ui-label" for="buy-input-fee">Fee:</label>
+                        <input type="text" name="fee" id="buy-input-fee" data-clear-btn="true" data-mini="true" />
+             </div>
+             <div class="ui-field-contain">
+                        <label class="ui-label" for="currency">currency:</label>
+                        <select name="currency" id="buy-input-currency" data-mini="true">
+                            <option value="1">The 1st Option</option>
+                            <option value="2">The 2nd Option</option>
+                            <option value="3">The 3rd Option</option>
+                            <option value="4">The 4th Option</option>
+                        </select>
+             </div>
+            <div class="ui-field-contain">
+                        <table id="productlist"></table>
+             </div>
+        </div>
+        <!-- /content -->
+        <div data-role="footer" data-position="fixed">
+            <a class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-delete" href="#">Cancel</a>
+            <h1>My App</h1>
+            <button id="save" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-check">Save</button>
+        </div>
+        <!-- /footer -->
+    </div>
+    <!-- /page -->
+</body>
+</html>

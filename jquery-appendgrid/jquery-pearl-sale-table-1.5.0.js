@@ -44,23 +44,17 @@
 		// The callback function to be triggered after grid row removed.
 		afterRowRemoved : null,
 		// The callback function to be triggered after grid row dragged.
-		afterRowDragged : null,
-
-		//Default column options
-		defaultColumns : [{
-				type : 'text',
-				diplay : 'No',
-				displayCss : null,
-				dataPriority : '1'
-			}, {
-				type : 'checkbox',
-				diplay : 'No',
-				displayCss : null,
-				dataPriority : '2',
-				visible : false
-			},
-		]
+		afterRowDragged : null,		
 	};
+    var _defaultNumColumnOptions = {
+           type : 'text',
+           name : 'no',
+           display :'No',
+           ctrlCss: {width:'5%'},
+           dataPriority: '1'
+    }
+    
+    
 	// Default column options.
 	var _defaultColumnOptions = {
 		// Type of column control.
@@ -280,7 +274,7 @@
 				var template = $.validator.format("<th 'data-priority'={0} style='text-align:center'>{1}</th>");
 
 				if (!settings.hideRowNumColumn) {
-					thCell = $(template("2", "No")).appendTo(tbHeadRow)
+					thCell = $(template(_defaultNumColumnOptions.dataPriority, _defaultNumColumnOptions.display)).appendTo(tbHeadRow).css(_defaultNumColumnOptions.ctrlCss);
 				}
 
 				// Prepare column information and add column header
@@ -709,7 +703,7 @@
 		return ctrl;
 	}
 	function createLabel(tbCell, id, name, data, context) {
-		var template = $.validator.format("<div><span id={0} name={1}> </span></div>");
+		var template = $.validator.format("<div class='ui-table-cell-text' ><span id={0} name={1}> </span></div>");
 		var ctrl = $(template(id, name)).appendTo(tbCell).css({
 				'textAlign' : 'center'
 			});
@@ -856,8 +850,8 @@
 
 			// Add row number
 			if (!settings.hideRowNumColumn) {
-				var ctrlId = settings.idPrefix + '_NO_' + uniqueIndex;
-				createTableCellContent(tbCell = $('<td></td>').appendTo(tbRow), 'text', ctrlId, ctrlId, null, null, null);
+				var ctrlId = settings.idPrefix + '_'+_defaultNumColumnOptions.name+'_' + uniqueIndex;
+				createTableCellContent(tbCell = $('<td></td>').appendTo(tbRow), 'text', ctrlId, ctrlId, null, "{width:10px}", null);
 				$('#' + ctrlId, tbBody).text(settings._rowOrder.length);
 				$(tbCell).appendTo(tbRow);
 				if (settings.useSubPanel)
@@ -871,17 +865,12 @@
 					hidden.push(y);
 					continue;
 				}
-				// Check column invisble
-				var className = 'ui-widget-content';
-				if (settings.columns[y].invisible)
-					className += ' invisible';
-
 				var tbCell = $("<td></td>").appendTo(tbRow);
 
 				var ctrlId = settings.idPrefix + '_' + settings.columns[y].name + '_' + uniqueIndex;
 				var ctrlName = ctrlId;
 				var ctrlType = settings.columns[y].type;
-				createTableCellContent(tbCell, ctrlType, ctrlId, ctrlId, null, null, {
+				createTableCellContent(tbCell, ctrlType, ctrlId, ctrlId, settings.columns[y].ctrlClass, settings.columns[y].ctrlCss, {
 					value : 'a',
 					options : [{
 							value : 'CH',
@@ -1019,7 +1008,7 @@
 		var settings = $(tbWhole).data('pearlSaleTable');
 		if (!settings.hideRowNumColumn) {
 			for (var z = startIndex; z < settings._rowOrder.length; z++) {			
-				$('#' + settings.idPrefix + '_NO_' + settings._rowOrder[z], tbWhole).text(z + 1);
+				$('#' + settings.idPrefix + '_'+_defaultNumColumnOptions.name+'_' + settings._rowOrder[z], tbWhole).text(z + 1);
 			}
 		}
 	}
