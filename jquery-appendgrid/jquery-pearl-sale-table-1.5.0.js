@@ -44,17 +44,18 @@
 		// The callback function to be triggered after grid row removed.
 		afterRowRemoved : null,
 		// The callback function to be triggered after grid row dragged.
-		afterRowDragged : null,		
+		afterRowDragged : null,
 	};
-    var _defaultNumColumnOptions = {
-           type : 'text',
-           name : 'no',
-           display :'No',
-           ctrlCss: {width:'5%'},
-           dataPriority: '1'
-    }
-    
-    
+	var _defaultNumColumnOptions = {
+		type : 'text',
+		name : 'no',
+		display : 'No',
+		ctrlCss : {
+			width : '5%'
+		},
+		dataPriority : '1'
+	}
+
 	// Default column options.
 	var _defaultColumnOptions = {
 		// Type of column control.
@@ -402,7 +403,7 @@
 			var settings = checkGridAndGetSettings(this);
 			if (settings) {
 				if (($.isArray(numOfRowOrRowArray) && numOfRowOrRowArray.length > 0) || ($.isNumeric(numOfRowOrRowArray) && numOfRowOrRowArray > 0)) {
-					// Define variables
+					// Define variables					
 					var tbWhole = this[0];
 					insertResult = insertRow(tbWhole, numOfRowOrRowArray, rowIndex, callerUniqueIndex);
 					// Reorder sequence as needed
@@ -537,22 +538,22 @@
 			}
 			return null;
 		},
-		getRowValue : function (rowIndex, uniqueIndex, loopIndex) {
-			var settings = checkGridAndGetSettings(this),
-			result = null;
+		getRowValue : function (rowIndex, uniqueIndex, columns, loopIndex) {
+			var settings = checkGridAndGetSettings(this);
+			var result = null;
 			if (settings) {
 				if ($.isNumeric(rowIndex) && rowIndex >= 0 && rowIndex < settings._rowOrder.length) {
 					uniqueIndex = settings._rowOrder[rowIndex];
 				}
 				if (!isEmpty(uniqueIndex)) {
-					result = getRowValue(settings, uniqueIndex, loopIndex);
+					result = getRowValue(settings, uniqueIndex, colums, loopIndex);
 				}
 			}
 			return result;
 		},
-		getAllValue : function (objectMode) {
-			var settings = checkGridAndGetSettings(this),
-			result = null;
+		getAllValue : function (objectMode, columns) {
+			var settings = checkGridAndGetSettings(this);
+			var result = null;
 			if (settings) {
 				// Prepare result based on objectMode setting
 				result = objectMode ? {}
@@ -561,10 +562,10 @@
 				// Process on each rows
 				for (var z = 0; z < settings._rowOrder.length; z++) {
 					if (objectMode) {
-						rowValue = getRowValue(settings, settings._rowOrder[z], z);
+						rowValue = getRowValue(settings, settings._rowOrder[z], columns, z);
 						$.extend(result, rowValue)
 					} else {
-						rowValue = getRowValue(settings, settings._rowOrder[z]);
+						rowValue = getRowValue(settings, settings._rowOrder[z], columns);
 						result.push(rowValue);
 					}
 				}
@@ -697,13 +698,13 @@
 
 	function createCheckbox(tbCell, id, name, data, context) {
 		var template = $.validator.format(
-				"<input type='checkbox' name={0} id={1} data-theme='b'/>");
+				"<input type='checkbox' name={0} id={1} data-mini='true' />");
 		var ctrl = $(template(name, id)).appendTo(tbCell);
 		$(tbCell).trigger('create');
 		return ctrl;
 	}
 	function createLabel(tbCell, id, name, data, context) {
-		var template = $.validator.format("<div class='ui-table-cell-text' ><span id={0} name={1}> </span></div>");
+		var template = $.validator.format("<div class='ui-table-cell-text' ><span id={0} name={1} style='vertical-align:middle'> </span></div>");
 		var ctrl = $(template(id, name)).appendTo(tbCell).css({
 				'textAlign' : 'center'
 			});
@@ -711,7 +712,7 @@
 	}
 	function createSelect(tbCell, id, name, data, context) {
 		var selectTemplate = $.validator.format(
-				'<select name={0} id={1}></select>');
+				"<select data-mini='true' name={0} id={1}></select>");
 		var ctrl = $(selectTemplate(name, id)).appendTo(tbCell);
 		var optionTemplate = $.validator.format('<option value={0}>{1}</option>');
 		data.options.forEach(function (entry) {
@@ -722,7 +723,7 @@
 	}
 
 	function createInput(tbCell, id, name, data, context) {
-		var inputTemplate = $.validator.format("<input type='text' name={0} id={1} data-clear-btn='true' />");
+		var inputTemplate = $.validator.format("<input type='text' data-mini='true' name={0} id={1} data-clear-btn='true' />");
 		var ctrl = $(inputTemplate(name, id)).appendTo(tbCell);
 		$(tbCell).trigger('create');
 		return ctrl;
@@ -757,7 +758,7 @@
 		$(tbCell).trigger('create');
 		return listViewHeader;
 	}
-
+	
 	// rowIndex specifies the row to be operated.
 	// callerUniqueIndex specifies the index of row corresponding data in data set.
 	function insertRow(tbWhole, numOfRowOrRowArray, rowIndex, callerUniqueIndex) {
@@ -787,7 +788,7 @@
 		if ($.isNumeric(callerUniqueIndex)) {
 			for (var z = 0; z < settings._rowOrder.length; z++) {
 				if (settings._rowOrder[z] == callerUniqueIndex) {
-					rowIndex = z;
+					rowIndex = z+1;
 					if (z != 0)
 						parentIndex = z - 1;
 					break;
@@ -850,7 +851,7 @@
 
 			// Add row number
 			if (!settings.hideRowNumColumn) {
-				var ctrlId = settings.idPrefix + '_'+_defaultNumColumnOptions.name+'_' + uniqueIndex;
+				var ctrlId = settings.idPrefix + '_' + _defaultNumColumnOptions.name + '_' + uniqueIndex;
 				createTableCellContent(tbCell = $('<td></td>').appendTo(tbRow), 'text', ctrlId, ctrlId, null, "{width:10px}", null);
 				$('#' + ctrlId, tbBody).text(settings._rowOrder.length);
 				$(tbCell).appendTo(tbRow);
@@ -898,7 +899,7 @@
 
 				var groupTemplate = $.validator.format("<div data-role='controlgroup' id={0} name={1} data-type='horizontal'></div>");
 				var group = $(groupTemplate(ctrlId, ctrlId)).appendTo(tbCell);
-				var btnTemplate = $.validator.format("<a class='ui-btn ui-corner-all {0} ui-btn-icon-notext' id={1} name={2} href='#' />");
+				var btnTemplate = $.validator.format("<a class='ui-btn ui-corner-all {0} ui-btn-icon-notext'  data-mini='true' id={1} name={2} href='#' />");
 				settings.customRowButtons.forEach(function (entry) {
 					var buttonId = ctrlId + '_' + entry;
 					$(btnTemplate(_defaultButtonResource[entry].icon, buttonId, buttonId)).appendTo(group).click(_defaultButtonResource[entry].onClick(tbWhole)).data('appendGrid', {
@@ -1007,8 +1008,8 @@
 	function sortSequence(tbWhole, startIndex) {
 		var settings = $(tbWhole).data('pearlSaleTable');
 		if (!settings.hideRowNumColumn) {
-			for (var z = startIndex; z < settings._rowOrder.length; z++) {			
-				$('#' + settings.idPrefix + '_'+_defaultNumColumnOptions.name+'_' + settings._rowOrder[z], tbWhole).text(z + 1);
+			for (var z = startIndex; z < settings._rowOrder.length; z++) {
+				$('#' + settings.idPrefix + '_' + _defaultNumColumnOptions.name + '_' + settings._rowOrder[z], tbWhole).text(z + 1);
 			}
 		}
 	}
@@ -1071,185 +1072,192 @@
 		}
 		return rowIndex;
 	}
-	function getRowValue(settings, uniqueIndex, loopIndex) {
-		var result = {},
-		keyName = null,
-		suffix = (isEmpty(loopIndex) ? '' : '_' + loopIndex);
-		for (var z = 0; z < settings.columns.length; z++) {
-			keyName = settings.columns[z].name + suffix;
-			result[keyName] = getCtrlValue(settings, z, uniqueIndex);
-		}
-		// Merge control values from sub panel if getter method defined
-		if (settings.useSubPanel && $.isFunction(settings.subPanelGetter)) {
-			var adtData = settings.subPanelGetter(uniqueIndex);
-			if ($.isPlainObject(adtData)) {
-				if (suffix == '') {
-					// Extend to row data directly for array mode
-					$.extend(result, adtData);
-				} else {
-					// For returning values in object mode, add suffix to all keys
-					var newData = {};
-					for (var key in adtData) {
-						newData[key + suffix] = adtData[key];
+	function getRowValue(settings, uniqueIndex, columns, loopIndex) {
+		var result = {};
+		var keyName = null;
+		var suffix = (isEmpty(loopIndex) ? '' : '_' + loopIndex);
+		if (isEmpty(columns)) {
+			for (var z = 0; z < settings.columns.length; z++) {
+				keyName = settings.columns[z].name + suffix;
+				result[keyName] = getCtrlValue(settings, z, uniqueIndex);
+			}
+		} else {
+			columns.forEach(function (z) {
+				keyName = settings.columns[z].name + suffix;
+				result[keyName] = getCtrlValue(settings, z, uniqueIndex);
+			})
+			}
+			// Merge control values from sub panel if getter method defined
+			if (settings.useSubPanel && $.isFunction(settings.subPanelGetter)) {
+				var adtData = settings.subPanelGetter(uniqueIndex);
+				if ($.isPlainObject(adtData)) {
+					if (suffix == '') {
+						// Extend to row data directly for array mode
+						$.extend(result, adtData);
+					} else {
+						// For returning values in object mode, add suffix to all keys
+						var newData = {};
+						for (var key in adtData) {
+							newData[key + suffix] = adtData[key];
+						}
+						$.extend(result, newData);
 					}
-					$.extend(result, newData);
 				}
 			}
+			return result;
 		}
-		return result;
-	}
-	function getCtrlValue(settings, colIndex, uniqueIndex) {
-		var ctrl = null,
-		type = settings.columns[colIndex].type,
-		columnName = settings.columns[colIndex].name;
-		if (type == 'checkbox') {
-			ctrl = getCellCtrl(type, settings.idPrefix, columnName, uniqueIndex);
-			if (ctrl == null)
-				return null;
-			else
-				return ctrl.checked ? 1 : 0;
-		} else if (type == 'custom') {
-			if ($.isFunction(settings.columns[colIndex].customGetter))
-				return settings.columns[colIndex].customGetter(settings.idPrefix, columnName, uniqueIndex);
-			else
-				return null;
-		} else {
-			ctrl = getCellCtrl(type, settings.idPrefix, columnName, uniqueIndex);
-			if (ctrl == null)
-				return null;
-			else
-				return ctrl.value;
-		}
-	}
-	function getCellCtrl(type, idPrefix, columnName, uniqueIndex) {
-		return document.getElementById(idPrefix + '_' + columnName + '_' + uniqueIndex);
-	}
-	function setCtrlValue(settings, colIndex, uniqueIndex, data) {
-		var type = settings.columns[colIndex].type;
-		var columnName = settings.columns[colIndex].name;
-		if (type == 'checkbox') {
-			getCellCtrl(type, settings.idPrefix, columnName, uniqueIndex).checked = (data != null && data != 0);
-		} else if (type == 'custom') {
-			if ($.isFunction(settings.columns[colIndex].customSetter)) {
-				settings.columns[colIndex].customSetter(settings.idPrefix, columnName, uniqueIndex, data);
+		function getCtrlValue(settings, colIndex, uniqueIndex) {
+			var ctrl = null,
+			type = settings.columns[colIndex].type,
+			columnName = settings.columns[colIndex].name;
+			if (type == 'checkbox') {
+				ctrl = getCellCtrl(type, settings.idPrefix, columnName, uniqueIndex);
+				if (ctrl == null)
+					return null;
+				else
+					return ctrl.checked ? 1 : 0;
+			} else if (type == 'custom') {
+				if ($.isFunction(settings.columns[colIndex].customGetter))
+					return settings.columns[colIndex].customGetter(settings.idPrefix, columnName, uniqueIndex);
+				else
+					return null;
+			} else {
+				ctrl = getCellCtrl(type, settings.idPrefix, columnName, uniqueIndex);
+				if (ctrl == null)
+					return null;
+				else
+					return ctrl.value;
 			}
-		} else if (type == 'select') {
-			var menu = getCellCtrl(type, settings.idPrefix, columnName, uniqueIndex);
-			menu.value = (data == null ? '' : data);
-			$(menu).selectmenu('refresh');
-		} else if (type == 'text') {
-			var label = getCellCtrl(type, settings.idPrefix, columnName, uniqueIndex);
-			$(label).text(data);
-		} else {
-			getCellCtrl(type, settings.idPrefix, columnName, uniqueIndex).value = (data == null ? '' : data);
 		}
-	}
-	function gridRowDragged(tbWhole, isMoveUp, uniqueIndex, tbRowIndex) {
-		// Get setting
-		var settings = $(tbWhole).data('pearlSaleTable');
-		// Find the start sorting index
-		var startIndex = -1;
-		for (var z = 0; z < settings._rowOrder.length; z++) {
-			if (settings._rowOrder[z] == uniqueIndex) {
-				if (isMoveUp) {
-					startIndex = tbRowIndex;
-					settings._rowOrder.splice(z, 1);
-					settings._rowOrder.splice(tbRowIndex, 0, uniqueIndex);
-				} else {
-					startIndex = z;
-					settings._rowOrder.splice(tbRowIndex + 1, 0, uniqueIndex);
-					settings._rowOrder.splice(z, 1);
+		function getCellCtrl(type, idPrefix, columnName, uniqueIndex) {
+			return document.getElementById(idPrefix + '_' + columnName + '_' + uniqueIndex);
+		}
+		function setCtrlValue(settings, colIndex, uniqueIndex, data) {
+			var type = settings.columns[colIndex].type;
+			var columnName = settings.columns[colIndex].name;
+			if (type == 'checkbox') {
+				getCellCtrl(type, settings.idPrefix, columnName, uniqueIndex).checked = (data != null && data != 0);
+			} else if (type == 'custom') {
+				if ($.isFunction(settings.columns[colIndex].customSetter)) {
+					settings.columns[colIndex].customSetter(settings.idPrefix, columnName, uniqueIndex, data);
 				}
-				break;
+			} else if (type == 'select') {
+				var menu = getCellCtrl(type, settings.idPrefix, columnName, uniqueIndex);
+				menu.value = (data == null ? '' : data);
+				$(menu).selectmenu('refresh');
+			} else if (type == 'text') {
+				var label = getCellCtrl(type, settings.idPrefix, columnName, uniqueIndex);
+				$(label).text(data);
+			} else {
+				getCellCtrl(type, settings.idPrefix, columnName, uniqueIndex).value = (data == null ? '' : data);
 			}
 		}
-		// Do re-order
-		sortSequence(tbWhole, startIndex);
-		// Save setting
-		saveSetting(tbWhole, settings);
+		function gridRowDragged(tbWhole, isMoveUp, uniqueIndex, tbRowIndex) {
+			// Get setting
+			var settings = $(tbWhole).data('pearlSaleTable');
+			// Find the start sorting index
+			var startIndex = -1;
+			for (var z = 0; z < settings._rowOrder.length; z++) {
+				if (settings._rowOrder[z] == uniqueIndex) {
+					if (isMoveUp) {
+						startIndex = tbRowIndex;
+						settings._rowOrder.splice(z, 1);
+						settings._rowOrder.splice(tbRowIndex, 0, uniqueIndex);
+					} else {
+						startIndex = z;
+						settings._rowOrder.splice(tbRowIndex + 1, 0, uniqueIndex);
+						settings._rowOrder.splice(z, 1);
+					}
+					break;
+				}
+			}
+			// Do re-order
+			sortSequence(tbWhole, startIndex);
+			// Save setting
+			saveSetting(tbWhole, settings);
 
-		// Trigger event
-		if ($.isFunction(settings.afterRowDragged)) {
-			settings.afterRowDragged(tbWhole, tbRowIndex);
+			// Trigger event
+			if ($.isFunction(settings.afterRowDragged)) {
+				settings.afterRowDragged(tbWhole, tbRowIndex);
+			}
 		}
-	}
-	function createGridButton(param, uiIcon) {
-		// Generate the standard grid action button based on its parameter.
-		var genButton = null;
-		if (param) {
-			if ($.isFunction(param)) {
-				// Generate button if it is a function.
-				genButton = $(param());
-			} else if (param.nodeType) {
-				// Clone the button if it is a DOM element.
-				genButton = $(param).clone();
-			} else if (param.icons) {
-				// Generate jQuery UI Button if it is a plain object with `icons` property.
+		function createGridButton(param, uiIcon) {
+			// Generate the standard grid action button based on its parameter.
+			var genButton = null;
+			if (param) {
+				if ($.isFunction(param)) {
+					// Generate button if it is a function.
+					genButton = $(param());
+				} else if (param.nodeType) {
+					// Clone the button if it is a DOM element.
+					genButton = $(param).clone();
+				} else if (param.icons) {
+					// Generate jQuery UI Button if it is a plain object with `icons` property.
+					genButton = $('<button/>').attr({
+							type : 'button'
+						}).button(param);
+				}
+			}
+			if (!genButton) {
+				// Use default setting (jQuery UI Button) if button is not created.
 				genButton = $('<button/>').attr({
 						type : 'button'
-					}).button(param);
+					}).button({
+						icons : {
+							primary : uiIcon
+						},
+						text : false
+					});
 			}
+			return genButton;
 		}
-		if (!genButton) {
-			// Use default setting (jQuery UI Button) if button is not created.
-			genButton = $('<button/>').attr({
-					type : 'button'
-				}).button({
-					icons : {
-						primary : uiIcon
-					},
-					text : false
-				});
-		}
-		return genButton;
-	}
-	function isRowEmpty(settings, rowIndex) {
-		for (var z = 0; z < settings.columns.length; z++) {
-			var uniqueIndex = settings._rowOrder[rowIndex];
-			var currentValue = getCtrlValue(settings, z, uniqueIndex);
-			// Check the empty criteria is function
-			if ($.isFunction(settings.columns[z].emptyCriteria)) {
-				if (!settings.columns[z].emptyCriteria(currentValue)) {
-					return false;
-				}
-			} else {
-				// Find the default value
-				var defaultValue = null;
-				if (!isEmpty(settings.columns[z].emptyCriteria)) {
-					defaultValue = settings.columns[z].emptyCriteria;
+		function isRowEmpty(settings, rowIndex) {
+			for (var z = 0; z < settings.columns.length; z++) {
+				var uniqueIndex = settings._rowOrder[rowIndex];
+				var currentValue = getCtrlValue(settings, z, uniqueIndex);
+				// Check the empty criteria is function
+				if ($.isFunction(settings.columns[z].emptyCriteria)) {
+					if (!settings.columns[z].emptyCriteria(currentValue)) {
+						return false;
+					}
 				} else {
-					// Check default value based on its type
-					if (settings.columns[z].type == 'checkbox') {
-						defaultValue = 0;
-					} else if (settings.columns[z].type == 'select' || settings.columns[z].type == 'ui-selectmenu') {
-						var options = getCellCtrl(settings.columns[z].type, settings.idPrefix, settings.columns[z].name, uniqueIndex).options;
-						if (options.length > 0) {
-							defaultValue = options[0].value;
+					// Find the default value
+					var defaultValue = null;
+					if (!isEmpty(settings.columns[z].emptyCriteria)) {
+						defaultValue = settings.columns[z].emptyCriteria;
+					} else {
+						// Check default value based on its type
+						if (settings.columns[z].type == 'checkbox') {
+							defaultValue = 0;
+						} else if (settings.columns[z].type == 'select' || settings.columns[z].type == 'ui-selectmenu') {
+							var options = getCellCtrl(settings.columns[z].type, settings.idPrefix, settings.columns[z].name, uniqueIndex).options;
+							if (options.length > 0) {
+								defaultValue = options[0].value;
+							} else {
+								defaultValue = '';
+							}
 						} else {
 							defaultValue = '';
 						}
-					} else {
-						defaultValue = '';
+					}
+					// Compare with the default value
+					if (currentValue != defaultValue) {
+						return false;
 					}
 				}
-				// Compare with the default value
-				if (currentValue != defaultValue) {
-					return false;
-				}
 			}
+			return true;
 		}
-		return true;
-	}
-	/// <summary>
-	/// Initialize append grid or calling its methods.
-	/// </summary>
-	$.fn.pearlSaleTable = function (params) {
-		if (_methods[params]) {
-			return _methods[params].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if (typeof(params) === 'object' || !params) {
-			return _methods.init.apply(this, arguments);
-		} else {
-			alert(_systemMessages.notSupportMethod + params);
-		}
-	};
-})(jQuery);
+		/// <summary>
+		/// Initialize append grid or calling its methods.
+		/// </summary>
+		$.fn.pearlSaleTable = function (params) {
+			if (_methods[params]) {
+				return _methods[params].apply(this, Array.prototype.slice.call(arguments, 1));
+			} else if (typeof(params) === 'object' || !params) {
+				return _methods.init.apply(this, arguments);
+			} else {
+				alert(_systemMessages.notSupportMethod + params);
+			}
+		};
+	})(jQuery);
