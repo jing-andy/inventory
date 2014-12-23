@@ -1,0 +1,142 @@
+﻿@{
+    ViewBag.Title = "Purchase";
+}
+
+ <script type="text/javascript">
+     $(document).ready(function () {
+         var brands ='@Model.BrandJson';
+         function brandOptions() {
+
+             return JSON.parse(brands.replace(/&quot;/g, '"'));
+         };
+            $('#productlist').pearlSaleTable({
+                caption: 'items',
+                initRows: 1,
+                showSelectButton: true,
+                useSubPanel: false,
+                columns: [
+                { name: 'brand', display: 'Brand', type: 'select', displayCss: { width: '15%'},options:brandOptions},
+                { name: 'sku', display: 'Sku', type: 'select', displayCss: { width: '15%'} },
+                { name: 'styleno', display: 'Style No', type: 'text', displayCss: { width: '10%'} },
+                { name: 'quantity', display: 'Quantity', type: 'input', displayCss: { width: '10%'} },
+                { name: 'listprice', display: 'List Price', type: 'input', displayCss: { width: '10%'} },
+                { name: 'price', display: 'Price', type: 'input', displayCss: { width: '10%'} },
+                { name: 'hastax', display: 'HasTax', type: 'checkbox', displayCss: { width: '5%'} }
+                ],
+               
+                customRowButtons: ['insert', 'delete'],
+                subPanelcolumns: [
+                { name: 'img', display: 'ID', type: 'img' },
+                { name: 'brand', display: 'Brand', type: 'p' },
+                { name: 'sku', display: 'sku', type: 'p' },
+                { name: 'quantity', display: 'Quantity', type: 'p' }
+                ]
+            });
+
+            $('#ui-btn-save').click(function (evt) {
+
+                var list = getInputValues();
+                alert(JSON.stringify(list));
+            });
+
+        });
+        function helper(){};
+        helper.productColumns = [0, 1, 4, 5, 6, 7];
+
+        function getInputValues() {
+            var result = {};
+            result.date = $('#buy-input-date').val();
+            result.store = $('#buy-input-store').val();
+            result.buyer = $('#buy-input-buyer').val();
+            result.fee = $('#buy-input-fee').val();
+            result.currency = $('#buy-input-currency').val();
+
+            result.products = $('#productlist').pearlSaleTable('getAllValue', false, helper.productColumns);
+            return result;
+        }        
+
+        function sendRequest(success_callback, failure_callback, data, ws_url, asynchronous) {
+            $.ajax({
+                async: asynchronous,
+                type: "GET",
+                crossDomain: true, //if cross domain req 
+                dataType: "json",
+                Accept: "application/json",
+                contentType: "application/json",
+                url: ws_url,
+                data: data,
+                success: success_callback,
+                error: failure_callback
+            });
+
+        }
+
+        function success_callback(response) {
+
+        }
+
+        function failure_callback(response) {
+
+        }
+
+    </script>
+    <!-- Start of first page -->
+    <div data-role="page" id="foo" data-theme="f">
+        <div data-role="header" data-position="fixed">
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#" data-icon="plus">new</a></li>
+                    <li><a href="#" data-icon="refresh">sync</a></li>
+                    <li><a href="#" data-icon="search">search</a></li>
+                </ul>
+            </div>
+        </div>
+        <div role="main" class="ui-content">
+            <div class="ui-field-contain">
+                        <label class="ui-label" for="buy-input-date">Date:</label>
+                        <input name="date" id="buy-input-date" type="text" data-role="date">
+             </div>
+             <div class="ui-field-contain">
+                        <label class="ui-label" for="buy-input-store">Store:</label>
+                 <select name="store" id="buy-input-store" data-mini="true">
+                     @foreach (var x in @Model.GetStores())
+                     {
+                         <option value=@x.Code>@x.Name</option>
+                     }
+                 </select>
+             </div>
+             <div class="ui-field-contain">
+                        <label class="ui-label" for="buy-input-buyer">Buyer:</label>
+                 <select name="buyer" id="buy-input-buyer" data-mini="true">
+                     @foreach (var x in @Model.GetBuyers())
+                     {
+                     <option value=@x.Code>@x.Name</option>
+                     }                     
+                 </select>
+             </div> 
+             <div class="ui-field-contain">
+                        <label class="ui-label" for="buy-input-fee">Fee:</label>
+                        <input type="text" name="fee" id="buy-input-fee" data-clear-btn="true" data-mini="true" />
+             </div>
+             <div class="ui-field-contain">
+                        <label class="ui-label" for="currency">currency:</label>
+                        <select name="currency" id="buy-input-currency" data-mini="true">
+                            @foreach (var x in @Model.GetCurrencies())
+                            {
+                            <option value=@x.Code>@x.Name</option>
+                            }
+                        </select>
+             </div>
+            <!--div class="ui-field-contain" -->
+                        <table id="productlist"></table>
+             <!-- /div -->
+        </div>
+        <!-- /content -->
+        <div data-role="footer" data-position="fixed">
+            <a id = "ui-btn-cancel" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-delete" href="#">Cancel</a>
+            <h1>My App</h1>
+            <button id="ui-btn-save" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-check">Save</button>
+        </div>
+        <!-- /footer -->
+    </div>
+    <!-- /page -->

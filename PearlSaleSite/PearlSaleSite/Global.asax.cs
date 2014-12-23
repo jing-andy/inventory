@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
-
+using System.Web.Http;
 namespace PearlSaleSite
 {
     // Note: For instructions on enabling IIS6 or IIS7 classic mode, 
@@ -24,7 +24,7 @@ namespace PearlSaleSite
             routes.MapRoute(
                 "Default", // Route name
                 "{controller}/{action}/{id}", // URL with parameters
-                new { controller = "Home", action = "ShipInput", id = UrlParameter.Optional } // Parameter defaults
+                new { controller = "Home", action = "PurchaseInput", id = UrlParameter.Optional } // Parameter defaults
             );
 
         }
@@ -34,7 +34,10 @@ namespace PearlSaleSite
             AreaRegistration.RegisterAllAreas();
 
             RegisterGlobalFilters(GlobalFilters.Filters);
+            WebApiConfig.Register(GlobalConfiguration.Configuration);
             RegisterRoutes(RouteTable.Routes);
+           // BundleConfig.RegisterBundles(BundleTable.Bundles);
+
         }
     }
 }

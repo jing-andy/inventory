@@ -361,8 +361,7 @@
 
 				// Show no rows in grid
 				if (settings._rowOrder.length == 0) {
-					var empty = $('<td style={display:inline}></td>').text(settings._i18n.rowEmpty).attr('colspan', settings._finalColSpan);
-					$('tbody', tbWhole).append($('<tr></tr>').addClass('empty').append(empty));
+                    insertRow(tbWhole, 1, 0, null);
 				}
 			}
 			$(target).table();
@@ -680,12 +679,12 @@
 		"input" : createInput
 	};
 
-	function createTableCellContent(tbCell, type, id, name, cssClass, cssAttribute, data, context) {
+    function createTableCellContent(tbCell, type, id, name, cssClass, cssAttribute, options, context) {
 		var t = type;
 		if (isEmpty(_tableCellContentFactory[t])) {
 			t = 'text';
 		}
-		var ctrl = _tableCellContentFactory[t](tbCell, id, name, data, context);
+        var ctrl = _tableCellContentFactory[t](tbCell, id, name, options, context);
 
 		if (!isEmpty(cssClass)) {
 			$(ctrl).addClass(cssClass)
@@ -696,33 +695,35 @@
 		}
 	}
 
-	function createCheckbox(tbCell, id, name, data, context) {
+    function createCheckbox(tbCell, id, name, options, context) {
 		var template = $.validator.format(
-				"<input type='checkbox' name={0} id={1} data-mini='true' />");
+				"<input type='checkbox' name={0} id={1} checked data-theme='b'/>");
 		var ctrl = $(template(name, id)).appendTo(tbCell);
 		$(tbCell).trigger('create');
 		return ctrl;
 	}
-	function createLabel(tbCell, id, name, data, context) {
+    function createLabel(tbCell, id, name, options, context) {
 		var template = $.validator.format("<div class='ui-table-cell-text' ><span id={0} name={1} style='vertical-align:middle'> </span></div>");
 		var ctrl = $(template(id, name)).appendTo(tbCell).css({
 				'textAlign' : 'center'
 			});
 		return ctrl;
 	}
-	function createSelect(tbCell, id, name, data, context) {
+    function createSelect(tbCell, id, name, options, context) {
 		var selectTemplate = $.validator.format(
 				"<select data-mini='true' name={0} id={1}></select>");
 		var ctrl = $(selectTemplate(name, id)).appendTo(tbCell);
+        if (!isEmpty(options)) {
 		var optionTemplate = $.validator.format('<option value={0}>{1}</option>');
-		data.options.forEach(function (entry) {
+            options.forEach(function (entry) {
 			$(optionTemplate(entry.value, entry.display)).appendTo(ctrl);
-		})
+            });
+        }
 		$(tbCell).trigger('create');
 		return ctrl;
 	}
 
-	function createInput(tbCell, id, name, data, context) {
+    function createInput(tbCell, id, name, options, context) {
 		var inputTemplate = $.validator.format("<input type='text' data-mini='true' name={0} id={1} data-clear-btn='true' />");
 		var ctrl = $(inputTemplate(name, id)).appendTo(tbCell);
 		$(tbCell).trigger('create');
@@ -871,17 +872,11 @@
 				var ctrlId = settings.idPrefix + '_' + settings.columns[y].name + '_' + uniqueIndex;
 				var ctrlName = ctrlId;
 				var ctrlType = settings.columns[y].type;
-				createTableCellContent(tbCell, ctrlType, ctrlId, ctrlId, settings.columns[y].ctrlClass, settings.columns[y].ctrlCss, {
-					value : 'a',
-					options : [{
-							value : 'CH',
-							display : 'Coach'
-						}, {
-							value : 'KS',
-							display : 'Kate Spade'
-						}
-					]
-				});
+                var options = settings.columns[y].options;
+                if (!isEmpty(options) && $.isFunction(options)) {
+                    options = options();
+                }
+                createTableCellContent(tbCell, ctrlType, ctrlId, ctrlId, null, null, options);
 
 				if (loadData) {
 					// Load data if needed

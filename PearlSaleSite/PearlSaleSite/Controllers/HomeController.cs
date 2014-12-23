@@ -16,14 +16,9 @@ namespace Pearl.Sale.Controllers
             return View();
         }
 
-        public ActionResult ShipInput()
+        public ActionResult PurchaseInput()
         {
-            var model = new ShipInputModel();
-
-            model.Warehouses = MockModelHelper.GetWarehoues();
-            model.Shippers = MockModelHelper.GetShippers();
-            model.Status = MockModelHelper.GetShipStatus();
-
+            var model = new MetadataRepository();            
 
             return View(model);
         }
